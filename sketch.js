@@ -9,15 +9,14 @@ let border;
 let angle = 0;
 
 let pieces = [
-  ['br','bn','bb','bq','bk','bb','bn','br']
-  ['bp','bp','bp','bp','bp','bp','bp','bp']
-  ['-','-','-','-','-','-','-','-']
-  ['-','-','-','-','-','-','-','-']
-  ['-','-','-','-','-','-','-','-']
-  ['-','-','-','-','-','-','-','-']
-  ['-','-','-','-','-','-','-','-']
-  ['wp','wp','wp','wp','wp','wp','wp','wp']
-  ['wr','wn','wb','wq','wk','wb','wn','wr']
+  ['br','bn','bb','bq','bk','bb','bn','br'],
+  ['bp','bp','bp','bp','bp','bp','bp','bp'],
+  ['-','-','-','-','-','-','-','-'],
+  ['-','-','-','-','-','-','-','-'],
+  ['-','-','-','-','-','-','-','-'],
+  ['-','-','-','-','-','-','-','-'],
+  ['wp','wp','wp','wp','wp','wp','wp','wp'],
+  ['wr','wn','wb','wq','wk','wb','wn','wr'],
 ];
 
 function updateContainer() {
@@ -45,15 +44,17 @@ function draw() {
   strokeWeight(5);
   rectMode("corners");
   rect(0, 0, width, height);
+  strokeWeight(1);
   for(let i = 0; i < 8; i++){
     for(let j = 0; j < 8; j++) {
-      if (i+j % 2 == 0) {
+      if ((i+j) % 2 == 0) {
         fill('#222222');
       } else {
         fill('#BBBBBB');
       }
       rect((w/8) * i, (h/8) * j, (w/8) * (i+1), (h/8) *(j+1));
-      text(pieces[i][j], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
+      fill('#888888');
+      text(pieces[j][i], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
     }
   }
 }
