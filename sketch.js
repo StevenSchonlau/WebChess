@@ -129,7 +129,7 @@ function rookMove(p1, p2) {
   } else {
     side = 'b';
   }
-  for(let i = p1; i <= 7; i++) {
+  for(let i = p1+1; i <= 7; i++) {
     if(pieces[i][p2] != '-') { //can't move past piece
       break;
     }
@@ -137,7 +137,7 @@ function rookMove(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = p1; i >= 0; i--) {
+  for(let i = p1+1; i >= 0; i--) {
     if(pieces[i][p2] != '-') { //can't move past piece
       break;
     }
@@ -145,7 +145,7 @@ function rookMove(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = p2; i <= 7; i++) {
+  for(let i = p2+1; i <= 7; i++) {
     if(pieces[p1][i] != '-') { //can't move past piece
       break;
     }
@@ -153,7 +153,7 @@ function rookMove(p1, p2) {
       returnarr.push("" + p1 + "" + i);
     }
   }
-  for(let i = p2; i >= 0; i--) {
+  for(let i = p2+1; i >= 0; i--) {
     if(pieces[p1][i] != '-') { //can't move past piece
       break;
     }
@@ -172,7 +172,7 @@ function bishopMove(p1, p2) {
   } else {
     side = 'b';
   }
-  for (let i = 0; i <= 7; i++) {
+  for (let i = 1; i <= 7; i++) {
     if(pieces[p1 + i][p2 + i] != '-') { //can't move past piece
       break;
     }
@@ -183,7 +183,7 @@ function bishopMove(p1, p2) {
       returnarr.push("" + (p1 + i) + "" + (p2 + i));
     }
   }
-  for (let i = 0; i <= 7; i++) {
+  for (let i = 1; i <= 7; i++) {
     if(pieces[p1 - i][p2 - i] != '-') { //can't move past piece
       break;
     }
@@ -194,7 +194,7 @@ function bishopMove(p1, p2) {
       returnarr.push("" + (p1 - i) + "" + (p2 - i));
     }
   }
-  for (let i = 0; i <= 7; i++) {
+  for (let i = 1; i <= 7; i++) {
     if(pieces[p1 - i][p2 + i] != '-') { //can't move past piece
       break;
     }
@@ -205,7 +205,171 @@ function bishopMove(p1, p2) {
       returnarr.push("" + (p1 - i) + "" + (p2 + i));
     }
   }
-  for (let i = 0; i <= 7; i++) {
+  for (let i = 1; i <= 7; i++) {
+    if(pieces[p1 + i][p2 - i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 + i > 7 || p2 - i < 0) {
+      break;
+    }
+    if (check_king(side, p1 + i, p2 - i)) {
+      returnarr.push("" + (p1 + i) + "" + (p2 - i));
+    }
+  }
+  
+  return returnarr;
+}
+
+function moveKnight(p1, p2) {
+  var returnarr = new Array();
+  var side = '-';
+  if (pieces[p1][p2][0] == 'w') {
+    side = 'w';
+  } else {
+    side = 'b';
+  }
+  if (p1+1 <= 7 && p2+2 <=7) {
+    if (pieces[p1+1][p2+2] == '-' && check_king(side, p1 + 1, p2 + 2)) {
+      returnarr.push("" + (p1 + 1) + "" + (p2 + 2));
+    }
+  }
+  if (p1-1 <= 7 && p2+2 <=7) {
+    if (pieces[p1-1][p2+2] == '-' && check_king(side, p1 - 1, p2 + 2)) {
+      returnarr.push("" + (p1 - 1) + "" + (p2 + 2));
+    }
+  }
+  if (p1+1 <= 7 && p2-2 <=7) {
+    if (pieces[p1+1][p2-2] == '-' && check_king(side, p1 + 1, p2 - 2)) {
+      returnarr.push("" + (p1 + 1) + "" + (p2 - 2));
+    }
+  }
+  if (p1-1 <= 7 && p2-2 <=7) {
+    if (pieces[p1-1][p2-2] == '-' && check_king(side, p1 - 1, p2 - 2)) {
+      returnarr.push("" + (p1 - 1) + "" + (p2 - 2));
+    }
+  }
+  if (p1+2 <= 7 && p2+1 <=7) {
+    if (pieces[p1+2][p2+1] == '-' && check_king(side, p1 + 2, p2 + 1)) {
+      returnarr.push("" + (p1 + 2) + "" + (p2 + 1));
+    }
+  }
+  if (p1-2 <= 7 && p2+1 <=7) {
+    if (pieces[p1-2][p2+1] == '-' && check_king(side, p1 - 2, p2 + 1)) {
+      returnarr.push("" + (p1 - 2) + "" + (p2 + 1));
+    }
+  }
+  if (p1+2 <= 7 && p2-1 <=7) {
+    if (pieces[p1+2][p2-1] == '-' && check_king(side, p1 + 2, p2 - 1)) {
+      returnarr.push("" + (p1 + 2) + "" + (p2 - 1));
+    }
+  }
+  if (p1-2 <= 7 && p2-1 <=7) {
+    if (pieces[p1-2][p2-1] == '-' && check_king(side, p1 - 2, p2 - 1)) {
+      returnarr.push("" + (p1 - 2) + "" + (p2 - 1));
+    }
+  }
+  return returnarr;
+}
+
+function moveKing(p1, p2) {
+  var returnarr = new Array();
+  var side = '-';
+  if (pieces[p1][p2][0] == 'w') {
+    side = 'w';
+  } else {
+    side = 'b';
+  }
+  for(let i = -1; i <= 1; i++) {
+    if (p1 + i > 7 || p1 + i < 0){
+      continue;
+    }
+    for(let j = -1; j <= 1; j++){
+      if (p2 + j > 7 || p2 + j < 0){
+        continue;
+      } else {
+        if(check_king(side, p1+i, p2+j) && pieces[p1+i][p2+j] == '-') {
+          returnarr.push(p1+i,p2+j);
+        }
+      }
+    }
+  }
+  return returnarr;
+}
+
+function moveQueen(p1, p2) {
+  var returnarr = new Array();
+  var side = '-';
+  if (pieces[p1][p2][0] == 'w') {
+    side = 'w';
+  } else {
+    side = 'b';
+  }
+  for(let i = p1+1; i <= 7; i++) {
+    if(pieces[i][p2] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, i, p2)) {
+      returnarr.push("" + i + "" + p2);
+    }
+  }
+  for(let i = p1+1; i >= 0; i--) {
+    if(pieces[i][p2] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, i, p2)) {
+      returnarr.push("" + i + "" + p2);
+    }
+  }
+  for(let i = p2+1; i <= 7; i++) {
+    if(pieces[p1][i] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, p1, i)) {
+      returnarr.push("" + p1 + "" + i);
+    }
+  }
+  for(let i = p2+1; i >= 0; i--) {
+    if(pieces[p1][i] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, p1, i)) {
+      returnarr.push("" + p1 + "" + i);
+    }
+  }
+  for (let i = 1; i <= 7; i++) {
+    if(pieces[p1 + i][p2 + i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 + i > 7 || p2 + i > 7) {
+      break;
+    }
+    if (check_king(side, p1 + i, p2 + i)) {
+      returnarr.push("" + (p1 + i) + "" + (p2 + i));
+    }
+  }
+  for (let i = 1; i <= 7; i++) {
+    if(pieces[p1 - i][p2 - i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 - i < 0 || p2 - i < 0) {
+      break;
+    }
+    if (check_king(side, p1 - i, p2 - i)) {
+      returnarr.push("" + (p1 - i) + "" + (p2 - i));
+    }
+  }
+  for (let i = 1; i <= 7; i++) {
+    if(pieces[p1 - i][p2 + i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 - i < 0 || p2 + i > 7) {
+      break;
+    }
+    if (check_king(side, p1 - i, p2 + i)) {
+      returnarr.push("" + (p1 - i) + "" + (p2 + i));
+    }
+  }
+  for (let i = 1; i <= 7; i++) {
     if(pieces[p1 + i][p2 - i] != '-') { //can't move past piece
       break;
     }
