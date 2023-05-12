@@ -8,13 +8,15 @@ let border;
 
 let angle = 0;
 
+let selected = '--';
+
 let pieces = [
   ['br','bn','bb','bq','bk','bb','bn','br'],
   ['bp','bp','bp','bp','bp','bp','bp','bp'],
-  ['-','-','-','-','-','-','-','-'],
-  ['-','-','-','-','-','-','-','-'],
-  ['-','-','-','-','-','-','-','-'],
-  ['-','-','-','-','-','-','-','-'],
+  ['--','--','--','--','--','--','--','--'],
+  ['--','--','--','--','--','--','--','--'],
+  ['--','--','--','--','--','--','--','--'],
+  ['--','--','--','--','--','--','--','--'],
   ['wp','wp','wp','wp','wp','wp','wp','wp'],
   ['wr','wn','wb','wq','wk','wb','wn','wr'],
 ];
@@ -47,15 +49,70 @@ function draw() {
   strokeWeight(1);
   for(let i = 0; i < 8; i++){
     for(let j = 0; j < 8; j++) {
-      if ((i+j) % 2 == 0) {
+      if (selected != '--' && j == selected[0] && i == selected[1]) {
+        fill('#222266')
+      } else if ((i+j) % 2 == 0) {
         fill('#222222');
       } else {
         fill('#BBBBBB');
       }
       rect((w/8) * i, (h/8) * j, (w/8) * (i+1), (h/8) *(j+1));
       fill('#888888');
+      textSize(20);
       text(pieces[j][i], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
     }
+  }
+  if (selected != '--') {
+    print(selected);
+    var movearr = checkMove();
+    if (movearr != '--') {
+      print(movearr);
+      for(let i = 0; i < movearr.length; i++){
+        print("something");
+        fill('#6666AA');
+        circle((w/8) * Number(movearr[i][1]) + (w/16), (h/8) * Number(movearr[i][0]) + (h/16), w/20);
+      }
+    }
+  }
+}
+
+function mouseClicked() {
+  for(let i = 0; i < 8; i++){
+    for(let j = 0; j < 8; j++) {
+      if((w/8) * j < mouseX && (h/8) * i < mouseY && (w/8) * (j+1) > mouseX && (h/8) *(i+1) > mouseY) {
+        selected = "" + i + "" + j;
+        return;
+      }
+    }
+  }
+  selected = '--';
+}
+
+function checkMove() {
+  print("hello");
+  if (pieces[selected[0]][selected[1]] == '--') {
+    print("nothing selected");
+    return ['--'];
+  }
+  print(pieces[selected[0]][selected[1]][1]);
+  if (pieces[selected[0]][selected[1]][1] == 'p') {
+    print(selected[0] + " " + selected[1]);
+    return pawnMove(selected[0], selected[1]);
+  }
+  if (pieces[selected[0]][selected[1]][1] == 'r') {
+    return rookMove(selected[0], selected[1]);
+  }
+  if (pieces[selected[0]][selected[1]][1] == 'b') {
+    return bishopMove(selected[0], selected[1]);
+  }
+  if (pieces[selected[0]][selected[1]][1] == 'n') {
+    return moveKnight(selected[0], selected[1]);
+  }
+  if (pieces[selected[0]][selected[1]][1] == 'q') {
+    return moveQueen(selected[0], selected[1]);
+  }
+  if (pieces[selected[0]][selected[1]][1] == 'k') {
+    return moveKing(selected[0], selected[1]);
   }
 }
 
@@ -73,54 +130,55 @@ function colorAlpha(aColor, alpha) {
 //need to add au pasante
 function pawnMove(p1, p2) {
   var returnarr = new Array();
-  if (pieces[p1] == w) {
-    if (p1 == 0) {
-      pawn_input('w', p1, p2);
-      return;
-    }
-    if (pieces[p1 - 1][p2 + 1] != '-') { //pawn attack right
-      if (check_king('w', p1, p2, p1 - 1, p2 + 1)) {
-        returnarr.push("" + (p1 - 1) + "" + (p2 + 1));
+  if (pieces[Number(p1)][p2][0] == 'w') {
+    if (p2 != 7) {
+      if (pieces[Number(p1) - 1][Number(p2) + 1] != '--') { //pawn attack right
+        if (check_king('w', p1, p2, Number(p1) - 1, Number(p1) + 1)) {
+          returnarr.push("" + (Number(p1) - 1) + "" + (Number(p1) + 1));
+        }
       }
     }
-    if (pieces[p1 - 1][p2 - 1] != '-') { //pawn attack left
-      if (check_king('w', p1, p2, p1 - 1, p2 - 1)) {
-        returnarr.push("" + (p1 - 1) + "" + (p2 - 1));
+    if (p2 != 0) {
+      if (pieces[Number(p1) - 1][Number(p2) - 1] != '--') { //pawn attack left
+        if (check_king('w', p1, p2, Number(p1) - 1, Number(p1) - 1)) {
+          returnarr.push("" + (Number(p1) - 1) + "" + (Number(p1) - 1));
+        }
       }
     }
-    if (pieces[p1 - 1][p2] == '-') { //pawn go forward
-      if (check_king('w', p1, p2, p1 - 1, p2)) {
-        returnarr.push("" + (p1 - 1) + "" + (p2));
+    if (pieces[Number(p1) - 1][Number(p2)] == '--') { //pawn go forward
+      if (check_king('w', p1, p2, Number(p1) - 1, p2)) {
+        returnarr.push("" + (Number(p1) - 1) + "" + (p2));
       }
     }
-    if (p1 == 6 && pieces[p1-2][p2] == '-') { //first move 2 spaces
-      if (check_king('w', p1, p2, p1 - 2, p2)) {
-        returnarr.push("" + (p1 - 2) + "" + (p2));
+    if (p1 == 6 && pieces[Number(p1)-2][Number(p2)] == '--') { //first move 2 spaces
+      if (check_king('w', p1, p2, Number(p1) - 2, p2)) {
+        returnarr.push("" + (Number(p1) - 2) + "" + (p2));
       }
     }
   } else {
-    if (p1 == 7) { //need to do on turn moved ****************************************
-      pawn_input('b', p1, p2);
-      return;
-    }
-    if (pieces[p1 + 1][p2 + 1] != '-') { //pawn attack right
-      if (check_king('b', p1, p2, p1 + 1, p2 + 1)) {
-        returnarr.push("" + (p1 + 1) + "" + (p2 + 1));
+    print("p1:" + (Number(p1)+1) + " " + "p2:" + Number(p1) + " " + pieces[Number(p1) + 1]);
+    if (p2 != 7) {
+      if (pieces[Number(p1) + 1][Number(p2) + 1] != '--') { //pawn attack right
+        if (check_king('b', p1, p2, Number(p1) + 1, Number(p1) + 1)) {
+          returnarr.push("" + (Number(p1) + 1) + "" + (Number(p1) + 1));
+        }
       }
     }
-    if (pieces[p1 + 1][p2 - 1] != '-') { //pawn attack left
-      if (check_king('b', p1, p2, p1 + 1, p2 - 1)) {
-        returnarr.push("" + (p1 + 1) + "" + (p2 - 1));
+    if (p2 != 0) {
+      if (pieces[Number(p1) + 1][Number(p2) - 1] != '--') { //pawn attack left
+        if (check_king('b', p1, p2, Number(p1) + 1, Number(p1) - 1)) {
+          returnarr.push("" + (Number(p1) + 1) + "" + (Number(p1) - 1));
+        }
       }
     }
-    if (pieces[p1 + 1][p2] == '-') { //pawn go forward
-      if (check_king('b', p1, p2, p1 + 1, p2)) {
-        returnarr.push("" + (p1 + 1) + "" + (p2));
+    if (pieces[Number(p1) + 1][Number(p2)] == '--') { //pawn go forward
+      if (check_king('b', p1, p2, Number(p1) + 1, p2)) {
+        returnarr.push("" + (Number(p1) + 1) + "" + (p2));
       }
     }
-    if (p1 == 6 && pieces[p1+2][p2] == '-') { //first move 2 spaces
-      if (check_king('b', p1, p2, p1 + 2, p2)) {
-        returnarr.push("" + (p1 + 2) + "" + (p2));
+    if (p1 == 1 && pieces[Number(p1)+2][Number(p2)] == '--') { //first move 2 spaces
+      if (check_king('b', p1, p2, Number(p1) + 2, p2)) {
+        returnarr.push("" + (Number(p1) + 2) + "" + (p2));
       }
     }
   }
@@ -135,14 +193,14 @@ function pawn_input(side, p1, p2) {
 //rook movement
 function rookMove(p1, p2) {
   var returnarr = new Array();
-  let side = '-';
-  if (pieces[p1][p2][0] == 'w') {
+  let side = '--';
+  if (pieces[Number(p1)][Number(p2)][0] == 'w') {
     side = 'w';
   } else {
     side = 'b';
   }
-  for(let i = p1+1; i <= 7; i++) {
-    if(pieces[i][p2] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i <= 7; i++) {
+    if(pieces[i][Number(p2)] != '--') { //can't move past piece
       if (check_king(side, p1, p2, i, p2)) {
         returnarr.push("" + i + "" + p2);
       }
@@ -152,8 +210,8 @@ function rookMove(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = p1+1; i >= 0; i--) {
-    if(pieces[i][p2] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i >= 0; i--) {
+    if(pieces[i][Number(p2)] != '--') { //can't move past piece
       if (check_king(side, p1, p2, i, p2)) {
         returnarr.push("" + i + "" + p2);
       }
@@ -163,26 +221,26 @@ function rookMove(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = p2+1; i <= 7; i++) {
-    if(pieces[p1][i] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i <= 7; i++) {
+    if(pieces[Number(p1)][i] != '--') { //can't move past piece
       if (check_king(side, p1, p2, p1, i)) {
-        returnarr.push("" + p1 + "" + i);
+        returnarr.push("" + Number(p1) + "" + i);
       }
       break;
     }
     if (check_king(side, p1, p2, p1, i)) {
-      returnarr.push("" + p1 + "" + i);
+      returnarr.push("" + Number(p1) + "" + i);
     }
   }
-  for(let i = p2+1; i >= 0; i--) {
-    if(pieces[p1][i] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i >= 0; i--) {
+    if(pieces[Number(p1)][i] != '--') { //can't move past piece
       if (check_king(side, p1, p2, p1, i)) {
-        returnarr.push("" + p1 + "" + i);
+        returnarr.push("" + Number(p1) + "" + i);
       }
       break;
     }
     if (check_king(side, p1, p2, p1, i)) {
-      returnarr.push("" + p1 + "" + i);
+      returnarr.push("" + Number(p1) + "" + i);
     }
   }
   return returnarr;
@@ -190,69 +248,69 @@ function rookMove(p1, p2) {
 
 function bishopMove(p1, p2) {
   var returnarr = new Array();
-  var side = '-';
-  if (pieces[p1][p2][0] == 'w') {
+  var side = '--';
+  if (pieces[Number(p1)][Number(p2)][0] == 'w') {
     side = 'w';
   } else {
     side = 'b';
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 + i > 7 || p2 + i > 7) {
+    if(Number(p1) + i > 7 || Number(p1) + i > 7) {
       break;
     }
-    if(pieces[p1 + i][p2 + i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 + i, p2 + i)) {
-        returnarr.push("" + (p1 + i) + "" + (p2 + i));
+    if(pieces[Number(p1) + i][Number(p2) + i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p1) + i)) {
+        returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) + i));
       }
       break;
     }
-    if (check_king(side, p1, p2, p1 + i, p2 + i)) {
-      returnarr.push("" + (p1 + i) + "" + (p2 + i));
+    if (check_king(side, p1, p2, Number(p1) + i, Number(p1) + i)) {
+      returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) + i));
     }
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 - i < 0 || p2 - i < 0) {
+    if(Number(p1) - i < 0 || Number(p1) - i < 0) {
       break;
     }
-    if(pieces[p1 - i][p2 - i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 - i, p2 - i)) {
-        returnarr.push("" + (p1 - i) + "" + (p2 - i));
+    if(pieces[Number(p1) - i][Number(p2) - i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p1) - i)) {
+        returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) - i));
       }
       break;
     }
     
-    if (check_king(side, p1, p2, p1 - i, p2 - i)) {
-      returnarr.push("" + (p1 - i) + "" + (p2 - i));
+    if (check_king(side, p1, p2, Number(p1) - i, Number(p1) - i)) {
+      returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) - i));
     }
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 - i < 0 || p2 + i > 7) {
+    if(Number(p1) - i < 0 || Number(p1) + i > 7) {
       break;
     }
-    if(pieces[p1 - i][p2 + i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 - i, p2 + i)) {
-        returnarr.push("" + (p1 - i) + "" + (p2 + i));
+    if(pieces[Number(p1) - i][Number(p2) + i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p1) + i)) {
+        returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) + i));
       }
       break;
     }
     
-    if (check_king(side, p1, p2, p1 - i, p2 + i)) {
-      returnarr.push("" + (p1 - i) + "" + (p2 + i));
+    if (check_king(side, p1, p2, Number(p1) - i, Number(p1) + i)) {
+      returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) + i));
     }
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 + i > 7 || p2 - i < 0) {
+    if(Number(p1) + i > 7 || Number(p1) - i < 0) {
       break;
     }
-    if(pieces[p1 + i][p2 - i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 + i, p2 - i)) {
-        returnarr.push("" + (p1 + i) + "" + (p2 - i));
+    if(pieces[Number(p1) + i][Number(p2) - i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p1) - i)) {
+        returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) - i));
       }
       break;
     }
     
-    if (check_king(side, p1, p2, p1 + i, p2 - i)) {
-      returnarr.push("" + (p1 + i) + "" + (p2 - i));
+    if (check_king(side, p1, p2, Number(p1) + i, Number(p1) - i)) {
+      returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) - i));
     }
   }
   
@@ -261,50 +319,50 @@ function bishopMove(p1, p2) {
 
 function moveKnight(p1, p2) {
   var returnarr = new Array();
-  var side = '-';
-  if (pieces[p1][p2][0] == 'w') {
+  var side = '--';
+  if (pieces[Number(p1)][Number(p2)][0] == 'w') {
     side = 'w';
   } else {
     side = 'b';
   }
-  if (p1+1 <= 7 && p2+2 <=7) {
-    if (check_king(side, p1, p2, p1 + 1, p2 + 2)) {
-      returnarr.push("" + (p1 + 1) + "" + (p2 + 2));
+  if (Number(p1) +1 <= 7 && Number(p1) +2 <=7) {
+    if (check_king(side, p1, p2, Number(p1) + 1, Number(p1) + 2)) {
+      returnarr.push("" + (Number(p1) + 1) + "" + (Number(p1) + 2));
     }
   }
-  if (p1-1 <= 7 && p2+2 <=7) {
-    if (check_king(side, p1, p2, p1 - 1, p2 + 2)) {
-      returnarr.push("" + (p1 - 1) + "" + (p2 + 2));
+  if (Number(p1) -1 >= 0 && Number(p1) +2 <=7) {
+    if (check_king(side, p1, p2, Number(p1) - 1, Number(p1) + 2)) {
+      returnarr.push("" + (Number(p1) - 1) + "" + (Number(p1) + 2));
     }
   }
-  if (p1+1 <= 7 && p2-2 <=7) {
-    if (check_king(side, p1, p2, p1 + 1, p2 - 2)) {
-      returnarr.push("" + (p1 + 1) + "" + (p2 - 2));
+  if (Number(p1) +1 <= 7 && Number(p1) -2 >= 0) {
+    if (check_king(side, p1, p2, Number(p1) + 1, Number(p1) - 2)) {
+      returnarr.push("" + (Number(p1) + 1) + "" + (Number(p1) - 2));
     }
   }
-  if (p1-1 <= 7 && p2-2 <=7) {
-    if (check_king(side, p1, p2, p1 - 1, p2 - 2)) {
-      returnarr.push("" + (p1 - 1) + "" + (p2 - 2));
+  if (Number(p1) -1 >= 0 && Number(p1) -2 >= 0) {
+    if (check_king(side, p1, p2, Number(p1) - 1, Number(p1) - 2)) {
+      returnarr.push("" + (Number(p1) - 1) + "" + (Number(p1) - 2));
     }
   }
-  if (p1+2 <= 7 && p2+1 <=7) {
-    if (check_king(side, p1, p2, p1 + 2, p2 + 1)) {
-      returnarr.push("" + (p1 + 2) + "" + (p2 + 1));
+  if (Number(p1) +2 <= 7 && Number(p1) +1 <=7) {
+    if (check_king(side, p1, p2, Number(p1) + 2, Number(p1) + 1)) {
+      returnarr.push("" + (Number(p1) + 2) + "" + (Number(p1) + 1));
     }
   }
-  if (p1-2 <= 7 && p2+1 <=7) {
-    if (check_king(side, p1, p2, p1 - 2, p2 + 1)) {
-      returnarr.push("" + (p1 - 2) + "" + (p2 + 1));
+  if (Number(p1) -2 >= 0 && Number(p1) +1 <=7) {
+    if (check_king(side, p1, p2, Number(p1) - 2, Number(p1) + 1)) {
+      returnarr.push("" + (Number(p1) - 2) + "" + (Number(p1) + 1));
     }
   }
-  if (p1+2 <= 7 && p2-1 <=7) {
-    if (check_king(side, p1, p2, p1 + 2, p2 - 1)) {
-      returnarr.push("" + (p1 + 2) + "" + (p2 - 1));
+  if (Number(p1) +2 <= 7 && Number(p1) -1 >= 0) {
+    if (check_king(side, p1, p2, Number(p1) + 2, Number(p1) - 1)) {
+      returnarr.push("" + (Number(p1) + 2) + "" + (Number(p1) - 1));
     }
   }
-  if (p1-2 <= 7 && p2-1 <=7) {
-    if (check_king(side, p1, p2, p1 - 2, p2 - 1)) {
-      returnarr.push("" + (p1 - 2) + "" + (p2 - 1));
+  if (Number(p1) -2 >= 0 && Number(p1) -1 >= 0) {
+    if (check_king(side, p1, p2, Number(p1) - 2, Number(p1) - 1)) {
+      returnarr.push("" + (Number(p1) - 2) + "" + (Number(p1) - 1));
     }
   }
   return returnarr;
@@ -312,22 +370,22 @@ function moveKnight(p1, p2) {
 
 function moveKing(p1, p2) {
   var returnarr = new Array();
-  var side = '-';
-  if (pieces[p1][p2][0] == 'w') {
+  var side = '--';
+  if (pieces[Number(p1)][Number(p2)][0] == 'w') {
     side = 'w';
   } else {
     side = 'b';
   }
   for(let i = -1; i <= 1; i++) {
-    if (p1 + i > 7 || p1 + i < 0){
+    if (Number(p1) + i > 7 || Number(p1) + i < 0){
       continue;
     }
     for(let j = -1; j <= 1; j++){
-      if (p2 + j > 7 || p2 + j < 0){
+      if (Number(p1) + j > 7 || Number(p1) + j < 0){
         continue;
       } else {
-        if(check_king(side, p1, p2, p1+i, p2+j) && pieces[p1+i][p2+j] == '-') {
-          returnarr.push(p1+i,p2+j);
+        if(check_king(side, p1, p2, Number(p1) +i, Number(p1) +j) && pieces[Number(p1)+i][Number(p2)+j] == '--') {
+          returnarr.push(Number(p1) +i,Number(p1) +j);
         }
       }
     }
@@ -337,14 +395,14 @@ function moveKing(p1, p2) {
 
 function moveQueen(p1, p2) {
   var returnarr = new Array();
-  var side = '-';
-  if (pieces[p1][p2][0] == 'w') {
+  var side = '--';
+  if (pieces[Number(p1)][Number(p2)][0] == 'w') {
     side = 'w';
   } else {
     side = 'b';
   }
-  for(let i = p1+1; i <= 7; i++) {
-    if(pieces[i][p2] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i <= 7; i++) {
+    if(pieces[i][Number(p2)] != '--') { //can't move past piece
       if (check_king(side, p1, p2, i, p2)) {
         returnarr.push("" + i + "" + p2);
       }
@@ -354,8 +412,8 @@ function moveQueen(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = p1+1; i >= 0; i--) {
-    if(pieces[i][p2] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i >= 0; i--) {
+    if(pieces[i][Number(p2)] != '--') { //can't move past piece
       if (check_king(side, p1, p2, i, p2)) {
         returnarr.push("" + i + "" + p2);
       }
@@ -365,83 +423,83 @@ function moveQueen(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = p2+1; i <= 7; i++) {
-    if(pieces[p1][i] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i <= 7; i++) {
+    if(pieces[Number(p1)][i] != '--') { //can't move past piece
       if (check_king(side, p1, p2, p1, i)) {
-        returnarr.push("" + p1 + "" + i);
+        returnarr.push("" + Number(p1) + "" + i);
       }
       break;
     }
     if (check_king(side, p1, p2, p1, i)) {
-      returnarr.push("" + p1 + "" + i);
+      returnarr.push("" + Number(p1) + "" + i);
     }
   }
-  for(let i = p2+1; i >= 0; i--) {
-    if(pieces[p1][i] != '-') { //can't move past piece
+  for(let i = Number(p1) +1; i >= 0; i--) {
+    if(pieces[Number(p1)][i] != '--') { //can't move past piece
       if (check_king(side, p1, p2, p1, i)) {
-        returnarr.push("" + p1 + "" + i);
+        returnarr.push("" + Number(p1) + "" + i);
       }
       break;
     }
     if (check_king(side, p1, p2, p1, i)) {
-      returnarr.push("" + p1 + "" + i);
+      returnarr.push("" + Number(p1) + "" + i);
     }
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 + i > 7 || p2 + i > 7) {
+    if(Number(p1) + i > 7 || Number(p1) + i > 7) {
       break;
     }
-    if(pieces[p1 + i][p2 + i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 + i, p2 + i)) {
-        returnarr.push("" + (p1 + i) + "" + (p2 + i));
+    if(pieces[Number(p1) + i][Number(p2) + i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p1) + i)) {
+        returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) + i));
       }
       break;
     }
-    if (check_king(side, p1, p2, p1 + i, p2 + i)) {
-      returnarr.push("" + (p1 + i) + "" + (p2 + i));
+    if (check_king(side, p1, p2, Number(p1) + i, Number(p1) + i)) {
+      returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) + i));
     }
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 - i < 0 || p2 - i < 0) {
+    if(Number(p1) - i < 0 || Number(p1) - i < 0) {
       break;
     }
-    if(pieces[p1 - i][p2 - i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 - i, p2 - i)) {
-        returnarr.push("" + (p1 - i) + "" + (p2 - i));
+    if(pieces[Number(p1) - i][Number(p2) - i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p1) - i)) {
+        returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) - i));
       }
       break;
     }
-    if (check_king(side, p1, p2, p1 - i, p2 - i)) {
-      returnarr.push("" + (p1 - i) + "" + (p2 - i));
+    if (check_king(side, p1, p2, Number(p1) - i, Number(p1) - i)) {
+      returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) - i));
     }
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 - i < 0 || p2 + i > 7) {
+    if(Number(p1) - i < 0 || Number(p1) + i > 7) {
       break;
     }
-    if(pieces[p1 - i][p2 + i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 - i, p2 + i)) {
-        returnarr.push("" + (p1 - i) + "" + (p2 + i));
+    if(pieces[Number(p1) - i][Number(p2) + i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p1) + i)) {
+        returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) + i));
       }
       break;
     }
     
-    if (check_king(side, p1, p2, p1 - i, p2 + i)) {
-      returnarr.push("" + (p1 - i) + "" + (p2 + i));
+    if (check_king(side, p1, p2, Number(p1) - i, Number(p1) + i)) {
+      returnarr.push("" + (Number(p1) - i) + "" + (Number(p1) + i));
     }
   }
   for (let i = 1; i <= 7; i++) {
-    if(p1 + i > 7 || p2 - i < 0) {
+    if(Number(p1) + i > 7 || Number(p1) - i < 0) {
       break;
     }
-    if(pieces[p1 + i][p2 - i] != '-') { //can't move past piece
-      if (check_king(side, p1, p2, p1 + i, p2 - i)) {
-        returnarr.push("" + (p1 + i) + "" + (p2 - i));
+    if(pieces[Number(p1) + i][Number(p2) - i] != '--') { //can't move past piece
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p1) - i)) {
+        returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) - i));
       }
       break;
     }
-    if (check_king(side, p1, p2, p1 + i, p2 - i)) {
-      returnarr.push("" + (p1 + i) + "" + (p2 - i));
+    if (check_king(side, p1, p2, Number(p1) + i, Number(p1) - i)) {
+      returnarr.push("" + (Number(p1) + i) + "" + (Number(p1) - i));
     }
   }
   
@@ -451,9 +509,14 @@ function moveQueen(p1, p2) {
 //checks if the move specified by p1 and p2 would have the king in check (includes king moves)
 function check_king(side, place1, place2, dest1, dest2) {
   //make copy of board with move:
-  var board = pieces;
+  var board = [[],[],[],[],[],[],[],[]];
+  for(let i = 0; i < 8; i++) {
+    for(let j = 0; j < 8; j++) {
+      board[i][j] = pieces[i][j]
+    }
+  }
   board[dest1][dest2] = board[place1][place2];
-  board[place1][place2] = '-';
+  board[place1][place2] = '--';
   //find king in new board
   let p1 = 0;
   let p2 = 0;
@@ -473,11 +536,11 @@ function check_king(side, place1, place2, dest1, dest2) {
       if (board[i][j][0] != side) {
         if (board[i][j][1] == 'p') { //pawns
           if (side == 'w') {
-            if (i == p1 - 1 && (j == p2 - 1 || j == p2 + 1)) {
+            if (i == Number(p1) - 1 && (j == Number(p1) - 1 || j == Number(p1) + 1)) {
               return false;
             }
           } else {
-            if (i == p1 + 1 && (j == p2 - 1 || j == p2 + 1)) {
+            if (i == Number(p1) + 1 && (j == Number(p1) - 1 || j == Number(p1) + 1)) {
               return false;
             }
           }
@@ -486,19 +549,19 @@ function check_king(side, place1, place2, dest1, dest2) {
           if (i == p1) {
             if (p1 > i) {
               for (let k = j + 1; k < p2; k++) {
-                if (board[i][k] != '-') {
+                if (board[i][k] != '--') {
                   break;
                 }
-                if (k == p2 - 1) {
+                if (k == Number(p1) - 1) {
                   return false;
                 }
               }
             } else {
               for (let k = j + 1; k < p2; k--) {
-                if (board[i][k] != '-') {
+                if (board[i][k] != '--') {
                   break;
                 }
-                if (k == p2 + 1) {
+                if (k == Number(p1) + 1) {
                   return false;
                 }
               }
@@ -507,19 +570,19 @@ function check_king(side, place1, place2, dest1, dest2) {
           if (j == p2) {
             if (i < p1) {
               for (let k = i + 1; k < p1; k++) {
-                if (board[i][k] != '-') {
+                if (board[i][k] != '--') {
                   break;
                 }
-                if (k == p2 - 1) {
+                if (k == Number(p1) - 1) {
                   return false;
                 }
               }
             } else {
               for (let k = i + 1; k < p1; k--) {
-                if (board[i][k] != '-') {
+                if (board[i][k] != '--') {
                   break;
                 }
-                if (k == p2 + 1) {
+                if (k == Number(p1) + 1) {
                   return false;
                 }
               }
@@ -530,40 +593,40 @@ function check_king(side, place1, place2, dest1, dest2) {
           if (abs(j-p2) == abs(i-p1)) {
             if (j < p2) {
               if (i < p1) {
-                for (let k = 1; k < abs(p1 - i); k++) {
-                  if (board[i+k][j+k] != '-') {
+                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                  if (board[i+k][j+k] != '--') {
                     break;
                   }
-                  if (k == abs(p1-i)-1) {
+                  if (k == abs(Number(p1) -i)-1) {
                     return false;
                   }
                 }
               } else {
-                for (let k = 1; k < abs(p1 - i); k++) {
-                  if (board[i-k][j+k] != '-') {
+                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                  if (board[i-k][j+k] != '--') {
                     break;
                   }
-                  if (k == abs(p1-i)-1) {
+                  if (k == abs(Number(p1) -i)-1) {
                     return false;
                   }
                 }
               }
             } else {
               if (i < p1) {
-                for (let k = 1; k < abs(p1 - i); k++) {
-                  if (board[i+k][j-k] != '-') {
+                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                  if (board[i+k][j-k] != '--') {
                     break;
                   }
-                  if (k == abs(p1-i)-1) {
+                  if (k == abs(Number(p1) -i)-1) {
                     return false;
                   }
                 }
               } else {
-                for (let k = 1; k < abs(p1 - i); k++) {
-                  if (board[i-k][j-k] != '-') {
+                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                  if (board[i-k][j-k] != '--') {
                     break;
                   }
-                  if (k == abs(p1-i)-1) {
+                  if (k == abs(Number(p1) -i)-1) {
                     return false;
                   }
                 }
