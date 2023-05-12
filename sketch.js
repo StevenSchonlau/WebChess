@@ -45,7 +45,17 @@ function draw() {
   strokeWeight(5);
   rectMode("corners");
   rect(0, 0, width, height);
-  
+  for(let i = 0; i < 8; i++){
+    for(let j = 0; j < 8; j++) {
+      if (i+j % 2 == 0) {
+        fill('#222222');
+      } else {
+        fill('#BBBBBB');
+      }
+      rect((w/8) * i, (h/8) * j, (w/8) * (i+1), (h/8) *(j+1));
+      text(pieces[i][j], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
+    }
+  }
 }
 
 function colorAlpha(aColor, alpha) {
