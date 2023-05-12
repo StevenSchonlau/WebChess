@@ -117,8 +117,107 @@ function pawnMove(p1, p2) {
 
 //changes pawn that makes it all the way across to user input
 function pawn_input(side, p1, p2) {
+  
+}
 
+//rook movement
+function rookMove(p1, p2) {
+  var returnarr = new Array();
+  let side = '-';
+  if (pieces[p1][p2][0] == 'w') {
+    side = 'w';
+  } else {
+    side = 'b';
+  }
+  for(let i = p1; i <= 7; i++) {
+    if(pieces[i][p2] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, i, p2)) {
+      returnarr.push("" + i + "" + p2);
+    }
+  }
+  for(let i = p1; i >= 0; i--) {
+    if(pieces[i][p2] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, i, p2)) {
+      returnarr.push("" + i + "" + p2);
+    }
+  }
+  for(let i = p2; i <= 7; i++) {
+    if(pieces[p1][i] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, p1, i)) {
+      returnarr.push("" + p1 + "" + i);
+    }
+  }
+  for(let i = p2; i >= 0; i--) {
+    if(pieces[p1][i] != '-') { //can't move past piece
+      break;
+    }
+    if (check_king(side, p1, i)) {
+      returnarr.push("" + p1 + "" + i);
+    }
+  }
+  return returnarr;
+}
 
+function bishopMove(p1, p2) {
+  var returnarr = new Array();
+  var side = '-';
+  if (pieces[p1][p2][0] == 'w') {
+    side = 'w';
+  } else {
+    side = 'b';
+  }
+  for (let i = 0; i <= 7; i++) {
+    if(pieces[p1 + i][p2 + i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 + i > 7 || p2 + i > 7) {
+      break;
+    }
+    if (check_king(side, p1 + i, p2 + i)) {
+      returnarr.push("" + (p1 + i) + "" + (p2 + i));
+    }
+  }
+  for (let i = 0; i <= 7; i++) {
+    if(pieces[p1 - i][p2 - i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 - i < 0 || p2 - i < 0) {
+      break;
+    }
+    if (check_king(side, p1 - i, p2 - i)) {
+      returnarr.push("" + (p1 - i) + "" + (p2 - i));
+    }
+  }
+  for (let i = 0; i <= 7; i++) {
+    if(pieces[p1 - i][p2 + i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 - i < 0 || p2 + i > 7) {
+      break;
+    }
+    if (check_king(side, p1 - i, p2 + i)) {
+      returnarr.push("" + (p1 - i) + "" + (p2 + i));
+    }
+  }
+  for (let i = 0; i <= 7; i++) {
+    if(pieces[p1 + i][p2 - i] != '-') { //can't move past piece
+      break;
+    }
+    if(p1 + i > 7 || p2 - i < 0) {
+      break;
+    }
+    if (check_king(side, p1 + i, p2 - i)) {
+      returnarr.push("" + (p1 + i) + "" + (p2 - i));
+    }
+  }
+  
+  return returnarr;
 }
 
 //checks if the move specified by p1 and p2 would have the king in check
