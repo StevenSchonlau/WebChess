@@ -121,12 +121,9 @@ function draw() {
     }
   }
   if (selected != '--') {
-    //print(selected);
     var movearr = checkMove();
     if (movearr != '--') {
-      //print(movearr);
       for(let i = 0; i < movearr.length; i++){
-        //print("something");
         fill('#6666AA');
         circle((w/8) * Number(movearr[i][1]) + (w/16), (h/8) * Number(movearr[i][0]) + (h/16), w/20);
       }
@@ -182,14 +179,10 @@ function mouseClicked() {
 }
 
 function checkMove() {
-  //print("hello");
   if (pieces[selected[0]][selected[1]] == '--') {
-    //print("nothing selected");
     return ['--'];
   }
-  //print(pieces[selected[0]][selected[1]][1]);
   if (pieces[selected[0]][selected[1]][1] == 'p') {
-    //print(selected[0] + " " + selected[1]);
     return pawnMove(selected[0], selected[1]);
   }
   if (pieces[selected[0]][selected[1]][1] == 'r') {
@@ -249,7 +242,6 @@ function pawnMove(p1, p2) {
       }
     }
   } else {
-    //print("p1:" + (Number(p1)+1) + " " + "p2:" + Number(p1) + " " + pieces[Number(p1) + 1]);
     if (p2 != 7) {
       if (pieces[Number(p1) + 1][Number(p2) + 1] != '--' && pieces[Number(p1) + 1][Number(p2) + 1][0] != 'b') { //pawn attack right
         if (check_king('b', p1, p2, Number(p1) + 1, Number(p2) + 1)) {
@@ -280,7 +272,6 @@ function pawnMove(p1, p2) {
 
 //changes pawn that makes it all the way across to user input
 function pawn_input(side, p1, p2) {
-  //print("good job");
 }
 
 //rook movement
@@ -477,7 +468,7 @@ function moveKing(p1, p2) {
       if (Number(p2) + j > 7 || Number(p2) + j < 0){
         continue;
       } else {
-        if(check_king(side, p1, p2, Number(p1) +i, Number(p2) +j) && pieces[Number(p1)+i][Number(p2)+j][0] != side) {
+        if(pieces[Number(p1)+i][Number(p2)+j][0] != side && check_king(side, p1, p2, Number(p1) +i, Number(p2) +j)) {
           returnarr.push("" + (Number(p1) +i) + "" + (Number(p2) +j));
         }
       }
@@ -626,105 +617,109 @@ function check_king(side, place1, place2, dest1, dest2) {
       }
     }
   }
-
   //check all other pieces
   for(let i = 0; i <= 7; i++) {
     for(let j = 0; j <= 7; j++) {
       if (board[i][j][0] != side) {
         if (board[i][j][1] == 'p') { //pawns
           if (side == 'w') {
-            if (i == Number(p1) - 1 && (j == Number(p1) - 1 || j == Number(p1) + 1)) {
+            if (i == Number(p1) - 1 && (j == Number(p2) - 1 || j == Number(p2) + 1)) {
               return false;
             }
           } else {
-            if (i == Number(p1) + 1 && (j == Number(p1) - 1 || j == Number(p1) + 1)) {
+            if (i == Number(p1) + 1 && (j == Number(p2) - 1 || j == Number(p2) + 1)) {
               return false;
             }
           }
         }
         if (board[i][j][1] == 'r' || board[i][j][1] == 'q') { //rooks or queens
           if (i == p1) {
-            if (p1 > i) {
-              for (let k = j + 1; k < p2; k++) {
+            if (p2 > j) {
+              for (let k = j + 1; k <= p2; k++) {
+                if (k == Number(p2)) {
+                  return false;
+                }
                 if (board[i][k] != '--') {
                   break;
-                }
-                if (k == Number(p1) - 1) {
-                  return false;
                 }
               }
             } else {
-              for (let k = j + 1; k < p2; k--) {
+              for (let k = j - 1; k >= p2; k--) {
+                if (k == Number(p2)) {
+                  return false;
+                }
                 if (board[i][k] != '--') {
                   break;
-                }
-                if (k == Number(p1) + 1) {
-                  return false;
                 }
               }
             }
           }
           if (j == p2) {
+          //   print("p1:" + p1 + " p2: " + p2 + " i:" + i + " j:" + j);
+          //   for(let y = 0; y < 8;y++) {
+          //     print(board[y]);
+          //   }
             if (i < p1) {
-              for (let k = i + 1; k < p1; k++) {
-                if (board[i][k] != '--') {
-                  break;
-                }
-                if (k == Number(p1) - 1) {
+              for (let k = i + 1; k <= p1; k++) {
+                if (k == Number(p1)) {
                   return false;
+                }
+                if (board[k][j] != '--') {
+                  break;
                 }
               }
             } else {
-              for (let k = i + 1; k < p1; k--) {
-                if (board[i][k] != '--') {
-                  break;
-                }
-                if (k == Number(p1) + 1) {
+              for (let k = i - 1; k >= p1; k--) {
+                if (k == Number(p1)) {
                   return false;
+                }
+                if (board[k][j] != '--') {
+                  break;
                 }
               }
             }
           }
         }
+          
         if (board[i][j][1] == 'b' || board[i][j][1] == 'q') { //bishops or queens
           if (abs(j-p2) == abs(i-p1)) {
             if (j < p2) {
               if (i < p1) {
-                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                for (let k = 1; k <= abs(Number(p1) - i); k++) {
+                  if (k == abs(Number(p1) -i)) {
+                    return false;
+                  }
                   if (board[i+k][j+k] != '--') {
                     break;
                   }
-                  if (k == abs(Number(p1) -i)-1) {
-                    return false;
-                  }
                 }
               } else {
-                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                for (let k = 1; k <= abs(Number(p1) - i); k++) {
+                  if (k == abs(Number(p1) -i)) {
+                    return false;
+                  }
                   if (board[i-k][j+k] != '--') {
                     break;
-                  }
-                  if (k == abs(Number(p1) -i)-1) {
-                    return false;
                   }
                 }
               }
             } else {
               if (i < p1) {
-                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                for (let k = 1; k <= abs(Number(p1) - i); k++) {
+                  if (k == abs(Number(p1) -i)) {
+                    return false;
+                  }
                   if (board[i+k][j-k] != '--') {
                     break;
                   }
-                  if (k == abs(Number(p1) -i)-1) {
-                    return false;
-                  }
                 }
               } else {
-                for (let k = 1; k < abs(Number(p1) - i); k++) {
+                for (let k = 1; k <= abs(Number(p1) - i); k++) {
+                  if (k == abs(Number(p1) -i)) {
+                    return false;
+                  }
                   if (board[i-k][j-k] != '--') {
                     break;
-                  }
-                  if (k == abs(Number(p1) -i)-1) {
-                    return false;
                   }
                 }
               }
@@ -732,8 +727,8 @@ function check_king(side, place1, place2, dest1, dest2) {
           }
         }
         if (board[i][j][1] == 'n') { //knights
-          if ((i + 1 == p1 && j + 2 == p2) || (i+1 == p1 && j-2 == p2) || (i-1 == p1 && j+2 == p2) || (i-1 == p2 && j-2 == p2) ||
-              (i + 2 == p1 && j + 1 == p2) || (i+2 == p1 && j-1 == p2) || (i-2 == p1 && j+1 == p2) || (i-2 == p2 && j-1 == p2)) {
+          if ((i + 1 == p1 && j + 2 == p2) || (i+1 == p1 && j-2 == p2) || (i-1 == p1 && j+2 == p2) || (i-1 == p1 && j-2 == p2) ||
+              (i + 2 == p1 && j + 1 == p2) || (i+2 == p1 && j-1 == p2) || (i-2 == p1 && j+1 == p2) || (i-2 == p1 && j-1 == p2)) {
             return false;
           }
         }
@@ -746,5 +741,6 @@ function check_king(side, place1, place2, dest1, dest2) {
       } //for loop
     } //for loop
   } //check if other side
+  
   return true;
 }
