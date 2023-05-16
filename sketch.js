@@ -23,6 +23,8 @@ let pieces = [
 let bcaptured = [];
 let wcaptured = [];
 
+let wturn = true;
+
 function updateContainer() {
   container = select('#sketchContainer');
   w = parseFloat(getComputedStyle(container.elt).getPropertyValue('width'));
@@ -101,14 +103,23 @@ function mouseClicked() {
             pieces[i][j] = pieces[selected[0]][selected[1]];
             pieces[selected[0]][selected[1]] = '--';
             selected = '--';
+            wturn = !wturn;
             return;
           } else {
-            selected = "" + i + "" + j;
-            return;
+            if ((pieces[i][j][0] == 'w' && wturn) || (pieces[i][j][0] == 'b' && !wturn) || pieces[i][j] == '--') {
+              selected = "" + i + "" + j;
+              return;
+            } else {
+              return;
+            }
           }
         } else {
-          selected = "" + i + "" + j;
-          return;
+          if ((pieces[i][j][0] == 'w' && wturn) || (pieces[i][j][0] == 'b' && !wturn) || pieces[i][j] == '--') {
+            selected = "" + i + "" + j;
+            return;
+          } else {
+            return;
+          }
         }
       }
     }
