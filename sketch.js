@@ -160,14 +160,14 @@ function pawnMove(p1, p2) {
   var returnarr = new Array();
   if (pieces[Number(p1)][p2][0] == 'w') {
     if (p2 != 7) {
-      if (pieces[Number(p1) - 1][Number(p2) + 1] != '--') { //pawn attack right
+      if (pieces[Number(p1) - 1][Number(p2) + 1] != '--' && pieces[Number(p1) - 1][Number(p2) + 1][0] != 'w') { //pawn attack right
         if (check_king('w', p1, p2, Number(p1) - 1, Number(p2) + 1)) {
           returnarr.push("" + (Number(p1) - 1) + "" + (Number(p2) + 1));
         }
       }
     }
     if (p2 != 0) {
-      if (pieces[Number(p1) - 1][Number(p2) - 1] != '--') { //pawn attack left
+      if (pieces[Number(p1) - 1][Number(p2) - 1] != '--' && pieces[Number(p1) - 1][Number(p2) - 1][0] != 'w') { //pawn attack left
         if (check_king('w', p1, p2, Number(p1) - 1, Number(p2) - 1)) {
           returnarr.push("" + (Number(p1) - 1) + "" + (Number(p2) - 1));
         }
@@ -186,14 +186,14 @@ function pawnMove(p1, p2) {
   } else {
     print("p1:" + (Number(p1)+1) + " " + "p2:" + Number(p1) + " " + pieces[Number(p1) + 1]);
     if (p2 != 7) {
-      if (pieces[Number(p1) + 1][Number(p2) + 1] != '--') { //pawn attack right
+      if (pieces[Number(p1) + 1][Number(p2) + 1] != '--' && pieces[Number(p1) + 1][Number(p2) + 1][0] != 'b') { //pawn attack right
         if (check_king('b', p1, p2, Number(p1) + 1, Number(p2) + 1)) {
           returnarr.push("" + (Number(p1) + 1) + "" + (Number(p2) + 1));
         }
       }
     }
     if (p2 != 0) {
-      if (pieces[Number(p1) + 1][Number(p2) - 1] != '--') { //pawn attack left
+      if (pieces[Number(p1) + 1][Number(p2) - 1] != '--' && pieces[Number(p1) + 1][Number(p2) - 1][0] != 'b') { //pawn attack left
         if (check_king('b', p1, p2, Number(p1) + 1, Number(p2) - 1)) {
           returnarr.push("" + (Number(p1) + 1) + "" + (Number(p2) - 1));
         }
@@ -229,7 +229,7 @@ function rookMove(p1, p2) {
   }
   for(let i = Number(p1) +1; i <= 7; i++) { //moving to the right
     if(pieces[i][Number(p2)] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, i, p2)) {
+      if (check_king(side, p1, p2, i, p2) && pieces[i][Number(p2)][0] != side) {
         returnarr.push("" + i + "" + p2);
       }
       break;
@@ -240,7 +240,7 @@ function rookMove(p1, p2) {
   }
   for(let i = Number(p1) -1; i >= 0; i--) { //moving to the left
     if(pieces[i][Number(p2)] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, i, p2)) {
+      if (check_king(side, p1, p2, i, p2) && pieces[i][Number(p2)][0] != side) {
         returnarr.push("" + i + "" + p2);
       }
       break;
@@ -251,7 +251,7 @@ function rookMove(p1, p2) {
   }
   for(let i = Number(p2) +1; i <= 7; i++) { //moving down
     if(pieces[Number(p1)][i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, p1, i)) {
+      if (check_king(side, p1, p2, p1, i) && pieces[Number(p1)][i][0] != side) {
         returnarr.push("" + Number(p1) + "" + i);
       }
       break;
@@ -262,7 +262,7 @@ function rookMove(p1, p2) {
   }
   for(let i = Number(p2) -1; i >= 0; i--) {
     if(pieces[Number(p1)][i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, p1, i)) {
+      if (check_king(side, p1, p2, p1, i) && pieces[Number(p1)][i][0] != side) {
         returnarr.push("" + Number(p1) + "" + i);
       }
       break;
@@ -287,7 +287,7 @@ function bishopMove(p1, p2) {
       break;
     }
     if(pieces[Number(p1) + i][Number(p2) + i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) + i)) {
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) + i) && pieces[Number(p1) + i][Number(p2) + i][0] != side) {
         returnarr.push("" + (Number(p1) + i) + "" + (Number(p2) + i));
       }
       break;
@@ -301,7 +301,7 @@ function bishopMove(p1, p2) {
       break;
     }
     if(pieces[Number(p1) - i][Number(p2) - i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) - i)) {
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) - i) && pieces[Number(p1) - i][Number(p2) - i][0] != side) {
         returnarr.push("" + (Number(p1) - i) + "" + (Number(p2) - i));
       }
       break;
@@ -316,7 +316,7 @@ function bishopMove(p1, p2) {
       break;
     }
     if(pieces[Number(p1) - i][Number(p2) + i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) + i)) {
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) + i) && pieces[Number(p1) - i][Number(p2) + i][0] != side) {
         returnarr.push("" + (Number(p1) - i) + "" + (Number(p2) + i));
       }
       break;
@@ -331,7 +331,7 @@ function bishopMove(p1, p2) {
       break;
     }
     if(pieces[Number(p1) + i][Number(p2) - i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) - i)) {
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) - i) && pieces[Number(p1) + i][Number(p2) - i][0] != side) {
         returnarr.push("" + (Number(p1) + i) + "" + (Number(p2) - i));
       }
       break;
@@ -354,42 +354,42 @@ function moveKnight(p1, p2) {
     side = 'b';
   }
   if (Number(p1) +1 <= 7 && Number(p2) +2 <=7) {
-    if (check_king(side, p1, p2, Number(p1) + 1, Number(p2) + 2)) {
+    if (check_king(side, p1, p2, Number(p1) + 1, Number(p2) + 2) && pieces[Number(p1) + 1][Number(p2) + 2][0] != side) {
       returnarr.push("" + (Number(p1) + 1) + "" + (Number(p2) + 2));
     }
   }
   if (Number(p1) -1 >= 0 && Number(p2) +2 <=7) {
-    if (check_king(side, p1, p2, Number(p1) - 1, Number(p2) + 2)) {
+    if (check_king(side, p1, p2, Number(p1) - 1, Number(p2) + 2) && pieces[Number(p1) - 1][Number(p2) + 2][0] != side) {
       returnarr.push("" + (Number(p1) - 1) + "" + (Number(p2) + 2));
     }
   }
   if (Number(p1) +1 <= 7 && Number(p2) -2 >= 0) {
-    if (check_king(side, p1, p2, Number(p1) + 1, Number(p2) - 2)) {
+    if (check_king(side, p1, p2, Number(p1) + 1, Number(p2) - 2) && pieces[Number(p1) + 1][Number(p2) - 2][0] != side) {
       returnarr.push("" + (Number(p1) + 1) + "" + (Number(p2) - 2));
     }
   }
   if (Number(p1) -1 >= 0 && Number(p2) -2 >= 0) {
-    if (check_king(side, p1, p2, Number(p1) - 1, Number(p2) - 2)) {
+    if (check_king(side, p1, p2, Number(p1) - 1, Number(p2) - 2) && pieces[Number(p1) - 1][Number(p2) - 2][0] != side) {
       returnarr.push("" + (Number(p1) - 1) + "" + (Number(p2) - 2));
     }
   }
   if (Number(p1) +2 <= 7 && Number(p2) +1 <=7) {
-    if (check_king(side, p1, p2, Number(p1) + 2, Number(p2) + 1)) {
+    if (check_king(side, p1, p2, Number(p1) + 2, Number(p2) + 1) && pieces[Number(p1) + 2][Number(p2) + 1][0] != side) {
       returnarr.push("" + (Number(p1) + 2) + "" + (Number(p2) + 1));
     }
   }
   if (Number(p1) -2 >= 0 && Number(p2) +1 <=7) {
-    if (check_king(side, p1, p2, Number(p1) - 2, Number(p2) + 1)) {
+    if (check_king(side, p1, p2, Number(p1) - 2, Number(p2) + 1) && pieces[Number(p1) -2][Number(p2) + 1][0] != side) {
       returnarr.push("" + (Number(p1) - 2) + "" + (Number(p2) + 1));
     }
   }
   if (Number(p1) +2 <= 7 && Number(p2) -1 >= 0) {
-    if (check_king(side, p1, p2, Number(p1) + 2, Number(p2) - 1)) {
+    if (check_king(side, p1, p2, Number(p1) + 2, Number(p2) - 1) && pieces[Number(p1) + 2][Number(p2) -1][0] != side) {
       returnarr.push("" + (Number(p1) + 2) + "" + (Number(p2) - 1));
     }
   }
   if (Number(p1) -2 >= 0 && Number(p2) -1 >= 0) {
-    if (check_king(side, p1, p2, Number(p1) - 2, Number(p2) - 1)) {
+    if (check_king(side, p1, p2, Number(p1) - 2, Number(p2) - 1) && pieces[Number(p1) -2][Number(p2) -1][0] != side) {
       returnarr.push("" + (Number(p1) - 2) + "" + (Number(p2) - 1));
     }
   }
@@ -409,11 +409,11 @@ function moveKing(p1, p2) {
       continue;
     }
     for(let j = -1; j <= 1; j++){
-      if (Number(p1) + j > 7 || Number(p1) + j < 0){
+      if (Number(p2) + j > 7 || Number(p2) + j < 0){
         continue;
       } else {
-        if(check_king(side, p1, p2, Number(p1) +i, Number(p1) +j) && pieces[Number(p1)+i][Number(p2)+j] == '--') {
-          returnarr.push(Number(p1) +i,Number(p1) +j);
+        if(check_king(side, p1, p2, Number(p1) +i, Number(p2) +j) && pieces[Number(p1)+i][Number(p2)+j][0] != side) {
+          returnarr.push("" + (Number(p1) +i) + "" + (Number(p2) +j));
         }
       }
     }
@@ -429,9 +429,10 @@ function moveQueen(p1, p2) {
   } else {
     side = 'b';
   }
-  for(let i = Number(p1) +1; i <= 7; i++) {
+  //rook movements:
+  for(let i = Number(p1) +1; i <= 7; i++) { //moving to the right
     if(pieces[i][Number(p2)] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, i, p2)) {
+      if (check_king(side, p1, p2, i, p2) && pieces[i][Number(p2)][0] != side) {
         returnarr.push("" + i + "" + p2);
       }
       break;
@@ -440,9 +441,9 @@ function moveQueen(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = Number(p1) -1; i >= 0; i--) {
+  for(let i = Number(p1) -1; i >= 0; i--) { //moving to the left
     if(pieces[i][Number(p2)] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, i, p2)) {
+      if (check_king(side, p1, p2, i, p2) && pieces[i][Number(p2)][0] != side) {
         returnarr.push("" + i + "" + p2);
       }
       break;
@@ -451,20 +452,20 @@ function moveQueen(p1, p2) {
       returnarr.push("" + i + "" + p2);
     }
   }
-  for(let i = Number(p2) +1; i <= 7; i++) {
+  for(let i = Number(p2) +1; i <= 7; i++) { //moving down
     if(pieces[Number(p1)][i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, p1, i)) {
+      if (check_king(side, p1, p2, p1, i) && pieces[Number(p1)][i][0] != side) {
         returnarr.push("" + Number(p1) + "" + i);
       }
       break;
     }
-    if (check_king(side, p1, p2, p1, i)) {
+    if (check_king(side, p1, p2, p1, i)) { //moving up
       returnarr.push("" + Number(p1) + "" + i);
     }
   }
   for(let i = Number(p2) -1; i >= 0; i--) {
     if(pieces[Number(p1)][i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, p1, i)) {
+      if (check_king(side, p1, p2, p1, i) && pieces[Number(p1)][i][0] != side) {
         returnarr.push("" + Number(p1) + "" + i);
       }
       break;
@@ -473,12 +474,13 @@ function moveQueen(p1, p2) {
       returnarr.push("" + Number(p1) + "" + i);
     }
   }
+  //bishop moves:
   for (let i = 1; i <= 7; i++) {
     if(Number(p1) + i > 7 || Number(p2) + i > 7) {
       break;
     }
     if(pieces[Number(p1) + i][Number(p2) + i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) + i)) {
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) + i) && pieces[Number(p1) + i][Number(p2) + i][0] != side) {
         returnarr.push("" + (Number(p1) + i) + "" + (Number(p2) + i));
       }
       break;
@@ -492,11 +494,12 @@ function moveQueen(p1, p2) {
       break;
     }
     if(pieces[Number(p1) - i][Number(p2) - i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) - i)) {
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) - i) && pieces[Number(p1) - i][Number(p2) - i][0] != side) {
         returnarr.push("" + (Number(p1) - i) + "" + (Number(p2) - i));
       }
       break;
     }
+    
     if (check_king(side, p1, p2, Number(p1) - i, Number(p2) - i)) {
       returnarr.push("" + (Number(p1) - i) + "" + (Number(p2) - i));
     }
@@ -506,7 +509,7 @@ function moveQueen(p1, p2) {
       break;
     }
     if(pieces[Number(p1) - i][Number(p2) + i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) + i)) {
+      if (check_king(side, p1, p2, Number(p1) - i, Number(p2) + i) && pieces[Number(p1) - i][Number(p2) + i][0] != side) {
         returnarr.push("" + (Number(p1) - i) + "" + (Number(p2) + i));
       }
       break;
@@ -521,11 +524,12 @@ function moveQueen(p1, p2) {
       break;
     }
     if(pieces[Number(p1) + i][Number(p2) - i] != '--') { //can't move past piece
-      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) - i)) {
+      if (check_king(side, p1, p2, Number(p1) + i, Number(p2) - i) && pieces[Number(p1) + i][Number(p2) - i][0] != side) {
         returnarr.push("" + (Number(p1) + i) + "" + (Number(p2) - i));
       }
       break;
     }
+    
     if (check_king(side, p1, p2, Number(p1) + i, Number(p2) - i)) {
       returnarr.push("" + (Number(p1) + i) + "" + (Number(p2) - i));
     }
