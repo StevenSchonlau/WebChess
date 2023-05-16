@@ -10,6 +10,20 @@ let angle = 0;
 
 let selected = '--';
 
+//images
+let bbi;
+let bni;
+let bri;
+let bki;
+let bqi;
+let bpi;
+let wbi;
+let wni;
+let wri;
+let wki;
+let wqi;
+let wpi;
+
 let pieces = [
   ['br','bn','bb','bq','bk','bb','bn','br'],
   ['bp','bp','bp','bp','bp','bp','bp','bp'],
@@ -43,6 +57,21 @@ function setup() {
   canvas.parent("#sketchContainer");
 }
 
+function preload() {
+  bbi = loadImage("PiecesImgs/bbFinal.png");
+  wbi = loadImage("PiecesImgs/wbfinal.png");
+  bpi = loadImage("PiecesImgs/bpfinal.png");
+  wpi = loadImage("PiecesImgs/wpfinal.png");
+  bni = loadImage("PiecesImgs/bnfinal.png");
+  wni = loadImage("PiecesImgs/wnfinal.png");
+  bki = loadImage("PiecesImgs/bkfinal.png");
+  wki = loadImage("PiecesImgs/wkfinal.png");
+  bqi = loadImage("PiecesImgs/bqfinal.png");
+  wqi = loadImage("PiecesImgs/wqfinal.png");
+  bri = loadImage("PiecesImgs/brfinal.png");
+  wri = loadImage("PiecesImgs/wrfinal.png");
+}
+
 function draw() {
   background("#DDDDDD");
   stroke('#222831');
@@ -54,25 +83,50 @@ function draw() {
   for(let i = 0; i < 8; i++){
     for(let j = 0; j < 8; j++) {
       if (selected != '--' && j == selected[0] && i == selected[1]) {
-        fill('#222266')
+        fill('#444466')
       } else if ((i+j) % 2 == 0) {
-        fill('#222222');
+        fill('#444444');
       } else {
-        fill('#BBBBBB');
+        fill('#AAAAAA');
       }
       rect((w/8) * i, (h/8) * j, (w/8) * (i+1), (h/8) *(j+1));
       fill('#888888');
       textSize(20);
-      text(pieces[j][i], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
+      //text(pieces[j][i], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
+      if (pieces[j][i] == 'bp') {
+        image(bpi, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'wp'){
+        image(wpi, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'wr'){
+        image(wri, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'br'){
+        image(bri, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'wn'){
+        image(wni, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'bn'){
+        image(bni, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'wb'){
+        image(wbi, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'bb'){
+        image(bbi, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'wq'){
+        image(wqi, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'bq'){
+        image(bqi, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'wk'){
+        image(wki, (w/8)*i, (h/8) * j, w/8, h/8);
+      } else if (pieces[j][i] == 'bk'){
+        image(bki, (w/8)*i, (h/8) * j, w/8, h/8);
+      }
     }
   }
   if (selected != '--') {
-    print(selected);
+    //print(selected);
     var movearr = checkMove();
     if (movearr != '--') {
-      print(movearr);
+      //print(movearr);
       for(let i = 0; i < movearr.length; i++){
-        print("something");
+        //print("something");
         fill('#6666AA');
         circle((w/8) * Number(movearr[i][1]) + (w/16), (h/8) * Number(movearr[i][0]) + (h/16), w/20);
       }
@@ -128,14 +182,14 @@ function mouseClicked() {
 }
 
 function checkMove() {
-  print("hello");
+  //print("hello");
   if (pieces[selected[0]][selected[1]] == '--') {
-    print("nothing selected");
+    //print("nothing selected");
     return ['--'];
   }
-  print(pieces[selected[0]][selected[1]][1]);
+  //print(pieces[selected[0]][selected[1]][1]);
   if (pieces[selected[0]][selected[1]][1] == 'p') {
-    print(selected[0] + " " + selected[1]);
+    //print(selected[0] + " " + selected[1]);
     return pawnMove(selected[0], selected[1]);
   }
   if (pieces[selected[0]][selected[1]][1] == 'r') {
@@ -195,7 +249,7 @@ function pawnMove(p1, p2) {
       }
     }
   } else {
-    print("p1:" + (Number(p1)+1) + " " + "p2:" + Number(p1) + " " + pieces[Number(p1) + 1]);
+    //print("p1:" + (Number(p1)+1) + " " + "p2:" + Number(p1) + " " + pieces[Number(p1) + 1]);
     if (p2 != 7) {
       if (pieces[Number(p1) + 1][Number(p2) + 1] != '--' && pieces[Number(p1) + 1][Number(p2) + 1][0] != 'b') { //pawn attack right
         if (check_king('b', p1, p2, Number(p1) + 1, Number(p2) + 1)) {
@@ -226,7 +280,7 @@ function pawnMove(p1, p2) {
 
 //changes pawn that makes it all the way across to user input
 function pawn_input(side, p1, p2) {
-  print("good job");
+  //print("good job");
 }
 
 //rook movement
