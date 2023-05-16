@@ -39,6 +39,8 @@ let wcaptured = [];
 
 let wturn = true;
 
+let drawing = true;
+
 function updateContainer() {
   container = select('#sketchContainer');
   w = parseFloat(getComputedStyle(container.elt).getPropertyValue('width'));
@@ -73,65 +75,104 @@ function preload() {
 }
 
 function draw() {
-  background("#DDDDDD");
-  stroke('#222831');
-  noFill();
-  strokeWeight(5);
-  rectMode("corners");
-  rect(0, 0, width, height);
-  strokeWeight(1);
-  for(let i = 0; i < 8; i++){
-    for(let j = 0; j < 8; j++) {
-      if (selected != '--' && j == selected[0] && i == selected[1]) {
-        fill('#444466')
-      } else if ((i+j) % 2 == 0) {
-        fill('#444444');
-      } else {
-        fill('#AAAAAA');
-      }
-      rect((w/8) * i, (h/8) * j, (w/8) * (i+1), (h/8) *(j+1));
-      fill('#888888');
-      textSize(20);
-      //text(pieces[j][i], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
-      if (pieces[j][i] == 'bp') {
-        image(bpi, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'wp'){
-        image(wpi, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'wr'){
-        image(wri, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'br'){
-        image(bri, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'wn'){
-        image(wni, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'bn'){
-        image(bni, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'wb'){
-        image(wbi, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'bb'){
-        image(bbi, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'wq'){
-        image(wqi, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'bq'){
-        image(bqi, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'wk'){
-        image(wki, (w/8)*i, (h/8) * j, w/8, h/8);
-      } else if (pieces[j][i] == 'bk'){
-        image(bki, (w/8)*i, (h/8) * j, w/8, h/8);
-      }
-    }
-  }
-  if (selected != '--') {
-    var movearr = checkMove();
-    if (movearr != '--') {
-      for(let i = 0; i < movearr.length; i++){
-        fill('#6666AA');
-        circle((w/8) * Number(movearr[i][1]) + (w/16), (h/8) * Number(movearr[i][0]) + (h/16), w/20);
+  if (drawing) {
+    background("#DDDDDD");
+    stroke('#222831');
+    noFill();
+    strokeWeight(5);
+    rectMode("corners");
+    rect(0, 0, width, height);
+    strokeWeight(1);
+    for(let i = 0; i < 8; i++){
+      for(let j = 0; j < 8; j++) {
+        if (selected != '--' && j == selected[0] && i == selected[1]) {
+          fill('#444466')
+        } else if ((i+j) % 2 == 0) {
+          fill('#444444');
+        } else {
+          fill('#AAAAAA');
+        }
+        rect((w/8) * i, (h/8) * j, (w/8) * (i+1), (h/8) *(j+1));
+        fill('#888888');
+        textSize(20);
+        //text(pieces[j][i], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
+        if (pieces[j][i] == 'bp') {
+          image(bpi, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'wp'){
+          image(wpi, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'wr'){
+          image(wri, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'br'){
+          image(bri, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'wn'){
+          image(wni, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'bn'){
+          image(bni, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'wb'){
+          image(wbi, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'bb'){
+          image(bbi, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'wq'){
+          image(wqi, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'bq'){
+          image(bqi, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'wk'){
+          image(wki, (w/8)*i, (h/8) * j, w/8, h/8);
+        } else if (pieces[j][i] == 'bk'){
+          image(bki, (w/8)*i, (h/8) * j, w/8, h/8);
+        }
       }
     }
+    //check stalemate or checkmate
+    let possible_moves = 0;
+    let temp_selected = selected;
+    for(let h = 0; h < 8; h++) {
+      for(let g = 0; g < 8; g++) {
+        if ((pieces[h][g][0] == 'w' && wturn) || (pieces[h][g][0] == 'b' && !wturn)) {
+          selected = h + "" + g;
+          var moves = checkMove();
+          possible_moves += moves.length;
+        }
+      }
+    }
+    selected = temp_selected;
+    if (possible_moves == 0) {
+      //find king and check if under attack
+      for (let h = 0; h < 8; h++) {
+        for (let g = 0; g< 8; g++) {
+          if ((pieces[h][g][0] == 'wk' && wturn)) {
+            if (!check_king('w', h, g, h, g)) {
+              print("STALEMATE");
+            } else {
+              print("WHITE CHECKMATE");
+            }
+            break;
+          } else if ((pieces[h][g] == 'bk' && !wturn)) {
+            if (!check_king('b', h, g, h, g)) {
+              print("STALEMATE");
+            } else {
+              print("BLACK CHECKMATE");
+            }
+            break;
+          }
+        }
+      }
+    }
+    if (selected != '--') {
+      var movearr = checkMove();
+      if (movearr != '--') {
+        for(let i = 0; i < movearr.length; i++){
+          fill('#6666AA');
+          circle((w/8) * Number(movearr[i][1]) + (w/16), (h/8) * Number(movearr[i][0]) + (h/16), w/20);
+        }
+      }
+    }
+    drawing = false;
   }
 }
 
 function mouseClicked() {
+  drawing = true;
   for(let i = 0; i < 8; i++){
     for(let j = 0; j < 8; j++) {
       if((w/8) * j < mouseX && (h/8) * i < mouseY && (w/8) * (j+1) > mouseX && (h/8) *(i+1) > mouseY) {
