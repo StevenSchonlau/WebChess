@@ -45,8 +45,16 @@ let pawn2 = 0;
 let pawn_upgrade = '-';
 
 let en_passante_row = -1;
-
 let wen_passante = true;
+
+let bqcastle = true;
+let bkcastle = true;
+let wqcastle = true;
+let wkcastle = true;
+
+let stalemate = false;
+let wwin = false;
+let bwin = false;
 
 let drawing = true;
 
@@ -59,6 +67,7 @@ function updateContainer() {
 function windowResized() {
   updateContainer();
   resizeCanvas(w, h);
+  drawing = true;
 }
 
 function setup() {
@@ -84,7 +93,7 @@ function preload() {
 }
 
 function draw() {
-  if (drawing && !pick_pawn) {
+  if (drawing && !pick_pawn && !stalemate && !wwin && !bwin) {
     background("#DDDDDD");
     stroke('#222831');
     noFill();
@@ -150,17 +159,21 @@ function draw() {
       for (let h = 0; h < 8; h++) {
         for (let g = 0; g < 8; g++) {
           if ((pieces[h][g][0] == 'wk' && wturn)) {
-            if (!check_king('w', 0, 0, 0, 0)) {
-              print("STALEMATE");
+            if (check_king('w', 0, 0, 0, 0)) { //checks board as is if king is in check
+              stalemate = true;
+              //print("STALEMATE");
             } else {
-              print("WHITE CHECKMATE");
+              bwin = true;
+              //print("WHITE CHECKMATE");
             }
             break;
           } else if ((pieces[h][g] == 'bk' && !wturn)) {
-            if (!check_king('b', 0, 0, 0, 0)) {
-              print("STALEMATE");
+            if (check_king('b', 0, 0, 0, 0)) { //checks board as is if king is in check
+              stalemate = true;
+              //print("STALEMATE");
             } else {
-              print("BLACK CHECKMATE");
+              wwin = true;
+              //print("BLACK CHECKMATE");
             }
             break;
           }
@@ -177,6 +190,21 @@ function draw() {
       }
     }
     drawing = false;
+  } else if (stalemate) {
+    fill('#FFFFFF');
+    textSize(30);
+    textAlign("center", "center");
+    text("STALEMATE", w/8, h/8, 3*(w/4), 3*(h/8));
+  } else if (bwin) {
+    fill('#FFFFFF');
+    textSize(30);
+    textAlign("center", "center");
+    text("Black Wins", w/8, h/8, 3*(w/4), 3*(h/8));
+  } else if (wwin) {
+    fill('#FFFFFF');
+    textSize(30);
+    textAlign("center", "center");
+    text("White Wins", w/8, h/8, 3*(w/4), 3*(h/8));
   } else if (pick_pawn) {
     fill('#999999');
     rect(w/8, h/8, 7*(w/8), 7*(h/8));
@@ -218,7 +246,7 @@ function mouseClicked() {
                 }
               }
               pieces[i][j] = pieces[selected[0]][selected[1]];
-              if (wturn && i == 0 && pieces[i][j] == 'wp') {
+              if (wturn && i == 0 && pieces[i][j] == 'wp') { // pawns gets to end
                 pawn1 = i;
                 pawn2 = j;
                 pawn_input();
@@ -229,7 +257,7 @@ function mouseClicked() {
               } else {
                 pieces[selected[0]][selected[1]] = '--';
               }
-              if (pieces[i][j] == 'wp' && selected[0] - i == 2) {
+              if (pieces[i][j] == 'wp' && selected[0] - i == 2) { // en passante
                 en_passante_row = j;
                 wen_passante = true;
               } else if (pieces[i][j] == 'bp' && selected[0] - i == -2) {
@@ -245,6 +273,39 @@ function mouseClicked() {
                   pieces[i-1][j] = '--';
                 }
                 en_passante_row = -1;
+              }
+              if (pieces[i][j] == 'bk') { //checks if castling pieces move
+                bkcastle = false;
+                bqcastle = false;
+              } else if (pieces[i][j] == 'br' && selected[1] == 0) {
+                bqcastle = false;
+              } else if (pieces[i][j] == 'br' && selected[1] == 7) {
+                bkcastle = false;
+              }
+              if (pieces[i][j] == 'wk') { //checks if castling pieces move
+                wkcastle = false;
+                wqcastle = false;
+              } else if (pieces[i][j] == 'wr' && selected[1] == 0) {
+                wqcastle = false;
+              } else if (pieces[i][j] == 'wr' && selected[1] == 7) {
+                wkcastle = false;
+              }
+
+              if (pieces[i][j] == 'wk' && wturn && selected[1] - j == -2) { //castles wk
+                pieces[7][5] = 'wr';
+                pieces[7][7] = '--';
+              }
+              if (pieces[i][j] == 'wk' && wturn && selected[1] - j == 2) { //castles wq
+                pieces[7][3] = 'wr';
+                pieces[7][0] = '--';
+              }
+              if (pieces[i][j] == 'bk' && !wturn && selected[1] - j == -2) { //castles bk
+                pieces[0][5] = 'br';
+                pieces[0][7] = '--';
+              }
+              if (pieces[i][j] == 'bk' && !wturn && selected[1] - j == 2) { //castles bq
+                pieces[0][3] = 'br';
+                pieces[0][0] = '--';
               }
               selected = '--';
               wturn = !wturn;
@@ -598,6 +659,27 @@ function moveKing(p1, p2) {
           returnarr.push("" + (Number(p1) +i) + "" + (Number(p2) +j));
         }
       }
+    }
+  }
+  //castling
+  if (wkcastle == true && side == 'w' && pieces[7][5] == '--' && pieces[7][6] == '--') {
+    if (check_king(side, p1, p2, 7, 5) && check_king(side, p1, p2, 7, 6) && check_king(side, 0, 0, 0, 0)) {
+      returnarr.push("76");
+    }
+  }
+  if (wqcastle == true && side == 'w' && pieces[7][2] == '--' && pieces[7][3] == '--' && pieces[7][1] == '--') {
+    if (check_king(side, p1, p2, 7, 2) && check_king(side, p1, p2, 7, 3) && check_king(side, 0, 0, 0, 0)) {
+      returnarr.push("72");
+    }
+  }
+  if (bkcastle == true && side == 'b' && pieces[0][5] == '--' && pieces[0][6] == '--') {
+    if (check_king(side, p1, p2, 0, 5) && check_king(side, p1, p2, 0, 6) && check_king(side, 0, 0, 0, 0)) {
+      returnarr.push("06");
+    }
+  }
+  if (bqcastle == true && side == 'b' && pieces[0][2] == '--' && pieces[0][3] == '--' && pieces[0][1] == '--') {
+    if (check_king(side, p1, p2, 0, 2) && check_king(side, p1, p2, 0, 3) && check_king(side, 0, 0, 0, 0)) {
+      returnarr.push("02");
     }
   }
   return returnarr;
