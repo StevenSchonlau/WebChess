@@ -39,6 +39,11 @@ let wcaptured = [];
 
 let wturn = true;
 
+let pick_pawn = false;
+let pawn1 = 0;
+let pawn2 = 0;
+let pawn_upgrade = '-';
+
 let drawing = true;
 
 function updateContainer() {
@@ -75,7 +80,7 @@ function preload() {
 }
 
 function draw() {
-  if (drawing) {
+  if (drawing && !pick_pawn) {
     background("#DDDDDD");
     stroke('#222831');
     noFill();
@@ -139,16 +144,16 @@ function draw() {
     if (possible_moves == 0) {
       //find king and check if under attack
       for (let h = 0; h < 8; h++) {
-        for (let g = 0; g< 8; g++) {
+        for (let g = 0; g < 8; g++) {
           if ((pieces[h][g][0] == 'wk' && wturn)) {
-            if (!check_king('w', h, g, h, g)) {
+            if (!check_king('w', 0, 0, 0, 0)) {
               print("STALEMATE");
             } else {
               print("WHITE CHECKMATE");
             }
             break;
           } else if ((pieces[h][g] == 'bk' && !wturn)) {
-            if (!check_king('b', h, g, h, g)) {
+            if (!check_king('b', 0, 0, 0, 0)) {
               print("STALEMATE");
             } else {
               print("BLACK CHECKMATE");
@@ -168,35 +173,69 @@ function draw() {
       }
     }
     drawing = false;
+  } else if (pick_pawn) {
+    fill('#999999');
+    rect(w/8, h/8, 7*(w/8), 7*(h/8));
+    if (wturn) {
+      image(bni, w/8, h/8, 3*(w/8), 3*(h/8));
+      image(bbi, w/2, h/8, 3*(w/8), 3*(h/8));
+      image(bri, w/8, h/2, 3*(w/8), 3*(h/8));
+      image(bqi, w/2, h/2, 3*(w/8), 3*(h/8));
+    } else {
+      image(wni, w/8, h/8, 3*(w/8), 3*(h/8));
+      image(wbi, w/2, h/8, 3*(w/8), 3*(h/8));
+      image(wri, w/8, h/2, 3*(w/8), 3*(h/8));
+      image(wqi, w/2, h/2, 3*(w/8), 3*(h/8));
+    }
+    pawn_input();
   }
 }
 
 function mouseClicked() {
   drawing = true;
-  for(let i = 0; i < 8; i++){
-    for(let j = 0; j < 8; j++) {
-      if((w/8) * j < mouseX && (h/8) * i < mouseY && (w/8) * (j+1) > mouseX && (h/8) *(i+1) > mouseY) {
-        if (selected != '--') {
-          var movearr = checkMove();
-          let found = false;
-          for (let k = 0; k < movearr.length; k++) {
-            if (i == movearr[k][0] && j == movearr[k][1]) {
-              found = true;
-            }
-          }
-          if (found) {
-            if (pieces[i][j] != '--') {
-              if (pieces[i][j][1] == 'w') {
-                wcaptured.push(pieces[i][j]);
-              } else {
-                bcaptured.push(pieces[i][j]);
+  if (!pick_pawn) {
+    for(let i = 0; i < 8; i++){
+      for(let j = 0; j < 8; j++) {
+        if((w/8) * j < mouseX && (h/8) * i < mouseY && (w/8) * (j+1) > mouseX && (h/8) *(i+1) > mouseY) {
+          if (selected != '--') {
+            var movearr = checkMove();
+            let found = false;
+            for (let k = 0; k < movearr.length; k++) {
+              if (i == movearr[k][0] && j == movearr[k][1]) {
+                found = true;
               }
             }
-            pieces[i][j] = pieces[selected[0]][selected[1]];
-            pieces[selected[0]][selected[1]] = '--';
-            selected = '--';
-            wturn = !wturn;
-            return;
+            if (found) {
+              if (pieces[i][j] != '--') {
+                if (pieces[i][j][1] == 'w') {
+                  wcaptured.push(pieces[i][j]);
+                } else {
+                  bcaptured.push(pieces[i][j]);
+                }
+              }
+              pieces[i][j] = pieces[selected[0]][selected[1]];
+              if (wturn && i == 0 && pieces[i][j] == 'wp') {
+                pawn1 = i;
+                pawn2 = j;
+                pawn_input();
+              } else if (!wturn && i == 7 && pieces[i][j] == 'bp') {
+                pawn1 = i;
+                pawn2 = j;
+                pawn_input();
+              } else {
+                pieces[selected[0]][selected[1]] = '--';
+              }
+              selected = '--';
+              wturn = !wturn;
+              return;
+            } else {
+              if ((pieces[i][j][0] == 'w' && wturn) || (pieces[i][j][0] == 'b' && !wturn) || pieces[i][j] == '--') {
+                selected = "" + i + "" + j;
+                return;
+              } else {
+                return;
+              }
+            }
           } else {
             if ((pieces[i][j][0] == 'w' && wturn) || (pieces[i][j][0] == 'b' && !wturn) || pieces[i][j] == '--') {
               selected = "" + i + "" + j;
@@ -205,18 +244,21 @@ function mouseClicked() {
               return;
             }
           }
-        } else {
-          if ((pieces[i][j][0] == 'w' && wturn) || (pieces[i][j][0] == 'b' && !wturn) || pieces[i][j] == '--') {
-            selected = "" + i + "" + j;
-            return;
-          } else {
-            return;
-          }
         }
       }
     }
+    selected = '--';
+  } else {
+    if (mouseX > w/8 && mouseY > h/8 && mouseX < w/2 && mouseY < h/2) {
+      pawn_upgrade = 'n';
+    } else if (mouseX > w/2 && mouseY > h/8 && mouseX < 7*(w/8) && mouseY < h/2){
+      pawn_upgrade = 'b';
+    } else if (mouseX > w/8 && mouseY > h/2 && mouseX < w/2 && mouseY < 7*(h/8)) {
+      pawn_upgrade = 'r';
+    } else if (mouseX > w/8 && mouseY > h/2 && mouseX < 7*(w/8) && mouseY < 7*(h/8)) {
+      pawn_upgrade = 'q';
+    }
   }
-  selected = '--';
 }
 
 function checkMove() {
@@ -312,7 +354,19 @@ function pawnMove(p1, p2) {
 }
 
 //changes pawn that makes it all the way across to user input
-function pawn_input(side, p1, p2) {
+function pawn_input() {
+  pick_pawn = true;
+  if (pawn_upgrade != '-') {
+    if (wturn) { //turn already changes by this time
+      pieces[pawn1][pawn2] = "b" + pawn_upgrade;
+      pieces[pawn1-1][pawn2] = '--';
+    } else {
+      pieces[pawn1][pawn2] = "w" + pawn_upgrade;
+      pieces[pawn1+1][pawn2] = '--';
+    }
+    pawn_upgrade = '-';
+    pick_pawn = false;
+  }
 }
 
 //rook movement
@@ -774,7 +828,7 @@ function check_king(side, place1, place2, dest1, dest2) {
           }
         }
         if (board[i][j][1] == 'k') { //king
-          if (abs(i-p1) == 1 && abs(j-p2)) { //within 1 square
+          if (abs(i-p1) <= 1 && abs(j-p2) <= 1) { //within 1 square
             return false;
           }
         }
