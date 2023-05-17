@@ -368,7 +368,7 @@ function pawn_input() {
     pick_pawn = false;
   }
 }
-
+ 
 //rook movement
 function rookMove(p1, p2) {
   var returnarr = new Array();
