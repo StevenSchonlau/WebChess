@@ -158,7 +158,7 @@ function draw() {
       //find king and check if under attack
       for (let h = 0; h < 8; h++) {
         for (let g = 0; g < 8; g++) {
-          if ((pieces[h][g][0] == 'wk' && wturn)) {
+          if ((pieces[h][g] == 'wk' && wturn)) {
             if (check_king('w', 0, 0, 0, 0)) { //checks board as is if king is in check
               stalemate = true;
               //print("STALEMATE");
@@ -195,16 +195,31 @@ function draw() {
     textSize(30);
     textAlign("center", "center");
     text("STALEMATE", w/8, h/8, 3*(w/4), 3*(h/8));
+    fill('#222222');
+    rect(w/8, h/2, 7*(w/8), 7*(h/8));
+    textSize(30);
+    fill('#FFFFFF');
+    text("Play again?", w/8, h/2, 3*(w/4), 3*(h/8));
   } else if (bwin) {
     fill('#FFFFFF');
     textSize(30);
     textAlign("center", "center");
     text("Black Wins", w/8, h/8, 3*(w/4), 3*(h/8));
+    fill('#222222');
+    rect(w/8, h/2, 7*(w/8), 7*(h/8));
+    textSize(30);
+    fill('#FFFFFF');
+    text("Play again?", w/8, h/2, 3*(w/4), 3*(h/8));
   } else if (wwin) {
     fill('#FFFFFF');
     textSize(30);
     textAlign("center", "center");
     text("White Wins", w/8, h/8, 3*(w/4), 3*(h/8));
+    fill('#222222');
+    rect(w/8, h/2, 7*(w/8), 7*(h/8));
+    textSize(30);
+    fill('#FFFFFF');
+    text("Play again?", w/8, h/2, 3*(w/4), 3*(h/8));
   } else if (pick_pawn) {
     fill('#999999');
     rect(w/8, h/8, 7*(w/8), 7*(h/8));
@@ -225,6 +240,42 @@ function draw() {
 
 function mouseClicked() {
   drawing = true;
+  if (stalemate || bwin || wwin) {
+    if (mouseX > w/8 && mouseX < 7*(w/8) && mouseY > h/2 && mouseY < 7*(h/8)) {
+      stalemate = false;
+      bwin = false;
+      wwin = false;
+      pieces = [
+        ['br','bn','bb','bq','bk','bb','bn','br'],
+        ['bp','bp','bp','bp','bp','bp','bp','bp'],
+        ['--','--','--','--','--','--','--','--'],
+        ['--','--','--','--','--','--','--','--'],
+        ['--','--','--','--','--','--','--','--'],
+        ['--','--','--','--','--','--','--','--'],
+        ['wp','wp','wp','wp','wp','wp','wp','wp'],
+        ['wr','wn','wb','wq','wk','wb','wn','wr'],
+      ];
+      bcaptured = [];
+      wcaptured = [];
+      
+      wturn = true;
+      
+      pick_pawn = false;
+      pawn1 = 0;
+      pawn2 = 0;
+      pawn_upgrade = '-';
+      
+      en_passante_row = -1;
+      wen_passante = true;
+      
+      bqcastle = true;
+      bkcastle = true;
+      wqcastle = true;
+      wkcastle = true;
+      drawing = true;
+    }
+    return;
+  }
   if (!pick_pawn) {
     for(let i = 0; i < 8; i++){
       for(let j = 0; j < 8; j++) {
