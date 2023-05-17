@@ -44,6 +44,10 @@ let pawn1 = 0;
 let pawn2 = 0;
 let pawn_upgrade = '-';
 
+let en_passante_row = -1;
+
+let wen_passante = true;
+
 let drawing = true;
 
 function updateContainer() {
@@ -207,7 +211,7 @@ function mouseClicked() {
             }
             if (found) {
               if (pieces[i][j] != '--') {
-                if (pieces[i][j][1] == 'w') {
+                if (pieces[i][j][0] == 'w') {
                   wcaptured.push(pieces[i][j]);
                 } else {
                   bcaptured.push(pieces[i][j]);
@@ -224,6 +228,23 @@ function mouseClicked() {
                 pawn_input();
               } else {
                 pieces[selected[0]][selected[1]] = '--';
+              }
+              if (pieces[i][j] == 'wp' && selected[0] - i == 2) {
+                en_passante_row = j;
+                wen_passante = true;
+              } else if (pieces[i][j] == 'bp' && selected[0] - i == -2) {
+                en_passante_row = j;
+                wen_passante = false;
+              } else {
+                if (pieces[i][j] == 'wp' && i == 2 && j == en_passante_row) {
+                  bcaptured.push(pieces[i+1][j]);
+                  pieces[i+1][j] = '--';
+                }
+                if (pieces[i][j] == 'bp' && i == 5 && j == en_passante_row) {
+                  wcaptured.push(pieces[i+1][j]);
+                  pieces[i-1][j] = '--';
+                }
+                en_passante_row = -1;
               }
               selected = '--';
               wturn = !wturn;
@@ -314,6 +335,11 @@ function pawnMove(p1, p2) {
         }
       }
     }
+    if (en_passante_row != -1 && !wen_passante && abs(p2 - en_passante_row) == 1 && p1 == 3) { //en passante
+      if (check_king('w', p1, p2, (Number(p1) - 1), en_passante_row)) {
+        returnarr.push("" + (Number(p1) - 1) + "" + en_passante_row);
+      }
+    }
     if (pieces[Number(p1) - 1][Number(p2)] == '--') { //pawn go forward
       if (check_king('w', p1, p2, Number(p1) - 1, p2)) {
         returnarr.push("" + (Number(p1) - 1) + "" + (p2));
@@ -337,6 +363,11 @@ function pawnMove(p1, p2) {
         if (check_king('b', p1, p2, Number(p1) + 1, Number(p2) - 1)) {
           returnarr.push("" + (Number(p1) + 1) + "" + (Number(p2) - 1));
         }
+      }
+    }
+    if (en_passante_row != -1 && wen_passante && abs(p2 - en_passante_row) == 1 && p1 == 4) { //en passante
+      if (check_king('b', p1, p2, (Number(p1) + 1), en_passante_row)) {
+        returnarr.push("" + (Number(p1) + 1) + "" + en_passante_row);
       }
     }
     if (pieces[Number(p1) + 1][Number(p2)] == '--') { //pawn go forward
