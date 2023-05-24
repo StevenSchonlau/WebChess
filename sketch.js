@@ -101,6 +101,10 @@ function draw() {
     rectMode("corners");
     rect(0, 0, width, height);
     strokeWeight(1);
+    let flip = 0;
+    if (!wturn) {
+      flip = 1;
+    }
     for(let i = 0; i < 8; i++){
       for(let j = 0; j < 8; j++) {
         if (selected != '--' && j == selected[0] && i == selected[1]) {
@@ -110,34 +114,35 @@ function draw() {
         } else {
           fill('#AAAAAA');
         }
-        rect((w/8) * i, (h/8) * j, (w/8) * (i+1), (h/8) *(j+1));
+        let height = abs(j-(7*flip));
+        let sideways = abs(i-(7*flip));
+        rect((w/8) * sideways, (h/8)*height, (w/8) * (sideways+1), (h/8) *(height+1));
         fill('#888888');
         textSize(20);
-        //text(pieces[j][i], (w/8)*i, (h/8)*j, (w/8) * (i+1), (h/8) *(j+1));
         if (pieces[j][i] == 'bp') {
-          image(bpi, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(bpi, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'wp'){
-          image(wpi, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(wpi, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'wr'){
-          image(wri, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(wri, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'br'){
-          image(bri, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(bri, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'wn'){
-          image(wni, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(wni, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'bn'){
-          image(bni, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(bni, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'wb'){
-          image(wbi, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(wbi, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'bb'){
-          image(bbi, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(bbi, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'wq'){
-          image(wqi, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(wqi, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'bq'){
-          image(bqi, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(bqi, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'wk'){
-          image(wki, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(wki, (w/8)*sideways, (h/8)*height, w/8, h/8);
         } else if (pieces[j][i] == 'bk'){
-          image(bki, (w/8)*i, (h/8) * j, w/8, h/8);
+          image(bki, (w/8)*sideways, (h/8)*height, w/8, h/8);
         }
       }
     }
@@ -161,19 +166,15 @@ function draw() {
           if ((pieces[h][g] == 'wk' && wturn)) {
             if (check_king('w', 0, 0, 0, 0)) { //checks board as is if king is in check
               stalemate = true;
-              //print("STALEMATE");
             } else {
               bwin = true;
-              //print("WHITE CHECKMATE");
             }
             break;
           } else if ((pieces[h][g] == 'bk' && !wturn)) {
             if (check_king('b', 0, 0, 0, 0)) { //checks board as is if king is in check
               stalemate = true;
-              //print("STALEMATE");
             } else {
               wwin = true;
-              //print("BLACK CHECKMATE");
             }
             break;
           }
@@ -185,7 +186,11 @@ function draw() {
       if (movearr != '--') {
         for(let i = 0; i < movearr.length; i++){
           fill('#6666AA');
-          circle((w/8) * Number(movearr[i][1]) + (w/16), (h/8) * Number(movearr[i][0]) + (h/16), w/20);
+          let flip = 0;
+          if (!wturn) {
+            flip = 1;
+          }
+          circle((w/8) * abs(Number(movearr[i][1])-7*flip) + (w/16), (h/8) * abs(Number(movearr[i][0])-7*flip) + (h/16), w/20);
         }
       }
     }
@@ -195,8 +200,8 @@ function draw() {
     textSize(30);
     textAlign("center", "center");
     text("STALEMATE", w/8, h/8, 3*(w/4), 3*(h/8));
-    fill('#222222');
-    rect(w/8, h/2, 7*(w/8), 7*(h/8));
+    fill(60, 60, 60, 10);
+    rect(0, 0, w, h);
     textSize(30);
     fill('#FFFFFF');
     text("Play again?", w/8, h/2, 3*(w/4), 3*(h/8));
@@ -205,8 +210,8 @@ function draw() {
     textSize(30);
     textAlign("center", "center");
     text("Black Wins", w/8, h/8, 3*(w/4), 3*(h/8));
-    fill('#222222');
-    rect(w/8, h/2, 7*(w/8), 7*(h/8));
+    fill(60, 60, 60, 10);
+    rect(0, 0, w, h);
     textSize(30);
     fill('#FFFFFF');
     text("Play again?", w/8, h/2, 3*(w/4), 3*(h/8));
@@ -215,8 +220,8 @@ function draw() {
     textSize(30);
     textAlign("center", "center");
     text("White Wins", w/8, h/8, 3*(w/4), 3*(h/8));
-    fill('#222222');
-    rect(w/8, h/2, 7*(w/8), 7*(h/8));
+    fill(60, 60, 60, 10);
+    rect(0, 0, w, h);
     textSize(30);
     fill('#FFFFFF');
     text("Play again?", w/8, h/2, 3*(w/4), 3*(h/8));
@@ -279,7 +284,13 @@ function mouseClicked() {
   if (!pick_pawn) {
     for(let i = 0; i < 8; i++){
       for(let j = 0; j < 8; j++) {
-        if((w/8) * j < mouseX && (h/8) * i < mouseY && (w/8) * (j+1) > mouseX && (h/8) *(i+1) > mouseY) {
+        let flip = 0;
+        if (!wturn) {
+          flip = 1;
+        }
+        let updown = abs(i-7*flip);
+        let sideways = abs(j-7*flip);
+        if((w/8) * sideways < mouseX && (h/8) * updown < mouseY && (w/8) * (sideways+1) > mouseX && (h/8) *(updown+1) > mouseY) {
           if (selected != '--') {
             var movearr = checkMove();
             let found = false;
@@ -914,10 +925,6 @@ function check_king(side, place1, place2, dest1, dest2) {
             }
           }
           if (j == p2) {
-          //   print("p1:" + p1 + " p2: " + p2 + " i:" + i + " j:" + j);
-          //   for(let y = 0; y < 8;y++) {
-          //     print(board[y]);
-          //   }
             if (i < p1) {
               for (let k = i + 1; k <= p1; k++) {
                 if (k == Number(p1)) {

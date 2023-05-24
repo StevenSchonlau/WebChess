@@ -1,17 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Goudy+Bookletter+1911&display=swap');
 
-a, h1 {
+h1 {
 	transition: color 0.3s ease-in-out;
+	font-size: 3vw;
+	margin-bottom: 2%;
+	margin-top: 5%;
+	text-align: center;
 }
 
 a:hover, h1:hover {
 	color: #c7b198;
 }
 
+p {
+	font-size: 1vw;
+	margin: 2%;
+	line-height: 110%;
+	margin-left: 0%;
+	text-align: center;
+}
+
 body {
 	font-family: 'Goudy Bookletter 1911', serif;
 	display: flex;
 	justify-content: left;
+	margin-left: 20%;
+	margin-right: auto;
+	max-width: 100%;
+	overflow: hidden;
 }
 
 #sketchContainer {
